@@ -1,0 +1,88 @@
+name: ButtondownKit
+
+# Standalone CI for ButtondownKit, following the BrightDigit CI template
+# (MistKit/SundialKit/SyndiKit) on Swift 6.4. ButtondownKit is
+# swift-tools-version:6.4, so every leg runs on the nightly 6.4 toolchain — the
+# only one that can resolve the manifest. Deps are public Apple OpenAPI URLs, so
+# the package builds standalone with no monorepo reconstruction. macOS legs are
+# intentionally omitted until a hosted runner ships a 6.4-capable toolchain.
+on:
+  push:
+    branches: [main, brightdigit-com-260406]
+    tags: ['v*.*.*']
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-ubuntu:
+    name: Build on Ubuntu
+    runs-on: ubuntu-latest
+    container: swiftlang/swift:nightly-6.4.x-noble
+    if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: brightdigit/swift-build@v1
+        id: build
+      - name: Install curl (required by Codecov uploader)
+        if: steps.build.outputs.contains-code-coverage == 'true'
+        run: |
+          if ! command -v curl &> /dev/null; then
+            apt-get update -q
+            apt-get install -y --no-install-recommends curl ca-certificates
+          fi
+      # brightdigit fork of swift-coverage-action: upstream @v5 can't pair the
+      # profdata with the test binary under Swift 6.4's swiftbuild layout
+      # (.so + <Name>-test-runner, no .xctest) — issue #92. Pinned by SHA.
+      - uses: brightdigit/swift-coverage-action@2f8538f723b99ab2406ac3a0e5b3355a9de4cf6c
+        if: steps.build.outputs.contains-code-coverage == 'true'
+        id: coverage-files
+        with:
+          search-paths: .build
+          fail-on-empty-output: true
+      - name: Upload coverage to Codecov
+        if: steps.build.outputs.contains-code-coverage == 'true'
+        uses: codecov/codecov-action@v7
+        with:
+          # fail_ci_if_error stays false until CODECOV_TOKEN is added to this
+          # repo's secrets.
+          fail_ci_if_error: false
+          flags: noble,swift-6.4
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ${{ join(fromJSON(steps.coverage-files.outputs.files), ',') }}
+
+  lint:
+    name: Linting
+    if: ${{ !cancelled() && !failure() && !contains(github.event.head_commit.message, 'ci skip') }}
+    needs: [build-ubuntu]
+    runs-on: ubuntu-latest
+    # Lint on the Swift 6.4 nightly so swift-format 604 builds against a matching
+    # swift-syntax. The bare nightly snapshot lacks curl, which mise-action needs
+    # to bootstrap mise, so install it first.
+    container: swiftlang/swift:nightly-6.4.x-noble
+    steps:
+      - name: Install curl (required by mise-action)
+        run: |
+          apt-get update -q
+          apt-get install -y --no-install-recommends curl ca-certificates
+      - uses: actions/checkout@v6
+      - uses: jdx/mise-action@v4
+        env:
+          MISE_HTTP_TIMEOUT: 300s
+          MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          cache: true
+      - name: Lint
+        run: ./Scripts/lint.sh
+        env:
+          LINT_MODE: STRICT
