@@ -160,4 +160,37 @@ import Testing
       _ = try ButtondownClient.fromEnvironment()
     }
   }
+
+  /// A documented error status on `sendDraft` surfaces as `unexpectedResponse`.
+  @Test internal func sendDraftUnexpectedStatusThrows() async throws {
+    let transport = MockTransport(responses: [
+      "POST /emails/\(Self.emailID)/send-draft": [
+        .init(status: 403, json: #"{"detail":"nope","code":"forbidden"}"#)
+      ]
+    ])
+    let client = try makeClient(transport)
+
+    await #expect(throws: ButtondownClient.ClientError.unexpectedResponse) {
+      try await client.sendDraft(id: Self.emailID)
+    }
+  }
+
+  /// A documented error status on `email(id:)` surfaces as `unexpectedResponse`.
+  @Test internal func retrieveEmailUnexpectedStatusThrows() async throws {
+    let transport = MockTransport(responses: [
+      "GET /emails/\(Self.emailID)": [
+        .init(status: 403, json: #"{"detail":"nope","code":"forbidden"}"#)
+      ]
+    ])
+    let client = try makeClient(transport)
+
+    await #expect(throws: ButtondownClient.ClientError.unexpectedResponse) {
+      _ = try await client.email(id: Self.emailID)
+    }
+  }
+
+  /// `init(apiKey:)` builds a live-transport client without throwing.
+  @Test internal func initWithAPIKeySucceeds() throws {
+    _ = try ButtondownClient(apiKey: Self.apiKey)
+  }
 }
