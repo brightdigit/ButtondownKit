@@ -1,0 +1,29 @@
+# swift-openapi-generator configuration for ButtondownKit.
+#
+# The client is generated AHEAD OF TIME by Scripts/generate-openapi-buttondown.sh
+# (using the generator pinned in .mise.toml) and the result is committed under
+# Sources/ButtondownKit/Generated. The generator is NOT a Package.swift
+# dependency and the build-tool plugin is NOT used.
+#
+# `filter` restricts code generation to the operations ButtondownKit needs for
+# newsletter publishing (create draft + send draft) plus the emails/subscribers
+# reads exercised by the contract tests. Transitively-referenced schemas are
+# pulled in automatically by the generator's filter.
+generate:
+  - types
+  - client
+accessModifier: public
+# Mark every generated file so swift-format and periphery skip it via in-file
+# markers. (SwiftLint can't be suppressed in-file — blanket_disable_command +
+# file_name — so it keeps a path exclude in .swiftlint.yml.)
+additionalFileComments:
+  - periphery:ignore:all
+  - swift-format-ignore-file
+filter:
+  operations:
+    - create_email      # POST /emails               — create a draft
+    - send_draft        # POST /emails/{id}/send-draft — send the draft
+    - list_emails       # GET  /emails               — read (round-trip tests)
+    - retrieve_email    # GET  /emails/{id}          — read (round-trip tests)
+    - list_subscribers  # GET  /subscribers          — subscriber read
+    - retrieve_subscriber # GET /subscribers/{id_or_email} — subscriber read

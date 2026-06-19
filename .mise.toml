@@ -1,0 +1,21 @@
+[settings]
+# Enable experimental features (required for the spm backend)
+experimental = true
+
+[tools]
+# Swift development tools (managed via mise)
+# 604.x aligns swift-format (and its swift-syntax) with the Swift 6.4 toolchain.
+# Only one 604 tag exists so far; bump when a newer 604 prerelease/release lands.
+"spm:swiftlang/swift-format" = "604.0.0-prerelease-2025-12-17"
+"aqua:realm/SwiftLint" = "0.63.2"
+"spm:peripheryapp/periphery" = "3.7.4"
+# swift-openapi-generator is used AHEAD OF TIME (not a Package.swift dependency
+# and not the build-tool plugin). Scripts/generate-openapi-buttondown.sh runs
+# this pinned CLI to regenerate the committed Sources/ButtondownKit/Generated.
+"spm:apple/swift-openapi-generator" = "1.12.2"
+
+[tasks]
+swift-format = "swift-format"
+swiftlint = "swiftlint"
+periphery = "periphery"
+generate-openapi = "./Scripts/generate-openapi-buttondown.sh"
