@@ -29,7 +29,13 @@
 
 import Foundation
 import OpenAPIRuntime
-import OpenAPIURLSession
+
+// URLSession transport is unavailable on WASI; the apiKey-based initializers that
+// build a `URLSessionTransport` are gated behind #if !os(WASI) below. WASI callers
+// construct a `Client` with a wasm-compatible transport and use `init(underlying:)`.
+#if !os(WASI)
+  import OpenAPIURLSession
+#endif
 
 /// A high-level async client for the subset of the Buttondown API used for
 /// newsletter publishing.
@@ -64,29 +70,33 @@ public struct ButtondownClient: Sendable {
     self.underlying = underlying
   }
 
-  /// Creates a client that talks to the live Buttondown API with the given key.
-  /// - Parameter apiKey: The Buttondown API key.
-  /// - Throws: An error if the server URL cannot be constructed.
-  public init(apiKey: String) throws {
-    let client = Client(
-      serverURL: try Servers.Server1.url(),
-      transport: URLSessionTransport(),
-      middlewares: [AuthenticationMiddleware(apiKey: apiKey)]
-    )
-    self.init(underlying: client)
-  }
-
-  /// Creates a client using the `BUTTONDOWN_API_KEY` environment variable.
-  /// - Throws: ``ClientError/missingAPIKey`` if the variable is unset/empty.
-  public static func fromEnvironment() throws -> ButtondownClient {
-    guard
-      let apiKey = ProcessInfo.processInfo.environment["BUTTONDOWN_API_KEY"],
-      !apiKey.isEmpty
-    else {
-      throw ClientError.missingAPIKey
+  // URLSession-backed conveniences. Unavailable on WASI (no URLSessionTransport);
+  // build a `Client` with a wasm-compatible transport and use `init(underlying:)`.
+  #if !os(WASI)
+    /// Creates a client that talks to the live Buttondown API with the given key.
+    /// - Parameter apiKey: The Buttondown API key.
+    /// - Throws: An error if the server URL cannot be constructed.
+    public init(apiKey: String) throws {
+      let client = Client(
+        serverURL: try Servers.Server1.url(),
+        transport: URLSessionTransport(),
+        middlewares: [AuthenticationMiddleware(apiKey: apiKey)]
+      )
+      self.init(underlying: client)
     }
-    return try ButtondownClient(apiKey: apiKey)
-  }
+
+    /// Creates a client using the `BUTTONDOWN_API_KEY` environment variable.
+    /// - Throws: ``ClientError/missingAPIKey`` if the variable is unset/empty.
+    public static func fromEnvironment() throws -> ButtondownClient {
+      guard
+        let apiKey = ProcessInfo.processInfo.environment["BUTTONDOWN_API_KEY"],
+        !apiKey.isEmpty
+      else {
+        throw ClientError.missingAPIKey
+      }
+      return try ButtondownClient(apiKey: apiKey)
+    }
+  #endif
 
   /// Creates a draft email (newsletter issue) from a Markdown body.
   ///
