@@ -149,17 +149,20 @@ import Testing
     }
   }
 
-  /// `fromEnvironment()` throws when `BUTTONDOWN_API_KEY` is unset.
-  ///
-  /// Disabled when the key happens to be set in the running environment.
-  @Test(
-    .enabled(if: ProcessInfo.processInfo.environment["BUTTONDOWN_API_KEY"] == nil)
-  )
-  internal func fromEnvironmentMissingKeyThrows() throws {
-    #expect(throws: ButtondownClient.ClientError.missingAPIKey) {
-      _ = try ButtondownClient.fromEnvironment()
+  // URLSession-backed initializers aren't available on WASI (see ButtondownClient).
+  #if !os(WASI)
+    /// `fromEnvironment()` throws when `BUTTONDOWN_API_KEY` is unset.
+    ///
+    /// Disabled when the key happens to be set in the running environment.
+    @Test(
+      .enabled(if: ProcessInfo.processInfo.environment["BUTTONDOWN_API_KEY"] == nil)
+    )
+    internal func fromEnvironmentMissingKeyThrows() throws {
+      #expect(throws: ButtondownClient.ClientError.missingAPIKey) {
+        _ = try ButtondownClient.fromEnvironment()
+      }
     }
-  }
+  #endif
 
   /// A documented error status on `sendDraft` surfaces as `unexpectedResponse`.
   @Test internal func sendDraftUnexpectedStatusThrows() async throws {
@@ -189,8 +192,10 @@ import Testing
     }
   }
 
-  /// `init(apiKey:)` builds a live-transport client without throwing.
-  @Test internal func initWithAPIKeySucceeds() throws {
-    _ = try ButtondownClient(apiKey: Self.apiKey)
-  }
+  #if !os(WASI)
+    /// `init(apiKey:)` builds a live-transport client without throwing.
+    @Test internal func initWithAPIKeySucceeds() throws {
+      _ = try ButtondownClient(apiKey: Self.apiKey)
+    }
+  #endif
 }
