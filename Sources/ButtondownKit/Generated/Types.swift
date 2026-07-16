@@ -34,6 +34,13 @@ public protocol APIProtocol: Sendable {
     /// - Remark: HTTP `GET /emails/{id}`.
     /// - Remark: Generated from `#/paths//emails/{id}/get(retrieve_email)`.
     func retrieve_email(_ input: Operations.retrieve_email.Input) async throws -> Operations.retrieve_email.Output
+    /// Update Email
+    ///
+    /// Update an email's properties
+    ///
+    /// - Remark: HTTP `PATCH /emails/{id}`.
+    /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)`.
+    func update_email(_ input: Operations.update_email.Input) async throws -> Operations.update_email.Output
     /// Send Draft
     ///
     /// Send a draft email to specific recipients
@@ -102,6 +109,23 @@ extension APIProtocol {
         try await retrieve_email(Operations.retrieve_email.Input(
             path: path,
             headers: headers
+        ))
+    }
+    /// Update Email
+    ///
+    /// Update an email's properties
+    ///
+    /// - Remark: HTTP `PATCH /emails/{id}`.
+    /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)`.
+    public func update_email(
+        path: Operations.update_email.Input.Path,
+        headers: Operations.update_email.Input.Headers = .init(),
+        body: Operations.update_email.Input.Body
+    ) async throws -> Operations.update_email.Output {
+        try await update_email(Operations.update_email.Input(
+            path: path,
+            headers: headers,
+            body: body
         ))
     }
     /// Send Draft
@@ -1275,6 +1299,107 @@ public enum Components {
             case free = "free"
             case churned = "churned"
             case archival = "archival"
+        }
+        /// - Remark: Generated from `#/components/schemas/EmailUpdateInput`.
+        public struct EmailUpdateInput: Codable, Hashable, Sendable {
+            /// The body of the email, in either HTML or markdown format. Buttondown attempts to intelligently detect the format of the body automatically, but you can also specify the format explicitly by prepending the text with the `buttondown-editor-mode` comment: `<!-- buttondown-editor-mode: fancy -->` or `<!-- buttondown-editor-mode: plaintext -->`.
+            ///
+            /// - Remark: Generated from `#/components/schemas/EmailUpdateInput/body`.
+            public var body: Swift.String?
+            /// A human-readable description of the email, used for archives and SEO.
+            ///
+            /// - Remark: Generated from `#/components/schemas/EmailUpdateInput/description`.
+            public var description: Swift.String?
+            /// A primary image URL used when previewing the email on the web or in other contexts.
+            ///
+            /// - Remark: Generated from `#/components/schemas/EmailUpdateInput/image`.
+            public var image: Swift.String?
+            /// The status of the email (e.g. `draft`, `about_to_send`, `sent`, `scheduled`).
+            ///
+            /// - Remark: Generated from `#/components/schemas/EmailUpdateInput/status`.
+            public struct statusPayload: Codable, Hashable, Sendable {
+                /// - Remark: Generated from `#/components/schemas/EmailUpdateInput/status/value1`.
+                public var value1: Components.Schemas.EmailStatus
+                /// Creates a new `statusPayload`.
+                ///
+                /// - Parameters:
+                ///   - value1:
+                public init(value1: Components.Schemas.EmailStatus) {
+                    self.value1 = value1
+                }
+                public init(from decoder: any Swift.Decoder) throws {
+                    self.value1 = try decoder.decodeFromSingleValueContainer()
+                }
+                public func encode(to encoder: any Swift.Encoder) throws {
+                    try encoder.encodeToSingleValueContainer(self.value1)
+                }
+            }
+            /// The status of the email (e.g. `draft`, `about_to_send`, `sent`, `scheduled`).
+            ///
+            /// - Remark: Generated from `#/components/schemas/EmailUpdateInput/status`.
+            public var status: Components.Schemas.EmailUpdateInput.statusPayload?
+            /// The subject line for the email.
+            ///
+            /// - Remark: Generated from `#/components/schemas/EmailUpdateInput/subject`.
+            public var subject: Swift.String?
+            /// Creates a new `EmailUpdateInput`.
+            ///
+            /// - Parameters:
+            ///   - body: The body of the email, in either HTML or markdown format. Buttondown attempts to intelligently detect the format of the body automatically, but you can also specify the format explicitly by prepending the text with the `buttondown-editor-mode` comment: `<!-- buttondown-editor-mode: fancy -->` or `<!-- buttondown-editor-mode: plaintext -->`.
+            ///   - description: A human-readable description of the email, used for archives and SEO.
+            ///   - image: A primary image URL used when previewing the email on the web or in other contexts.
+            ///   - status: The status of the email (e.g. `draft`, `about_to_send`, `sent`, `scheduled`).
+            ///   - subject: The subject line for the email.
+            public init(
+                body: Swift.String? = nil,
+                description: Swift.String? = nil,
+                image: Swift.String? = nil,
+                status: Components.Schemas.EmailUpdateInput.statusPayload? = nil,
+                subject: Swift.String? = nil
+            ) {
+                self.body = body
+                self.description = description
+                self.image = image
+                self.status = status
+                self.subject = subject
+            }
+            public enum CodingKeys: String, CodingKey {
+                case body
+                case description
+                case image
+                case status
+                case subject
+            }
+            public init(from decoder: any Swift.Decoder) throws {
+                let container = try decoder.container(keyedBy: CodingKeys.self)
+                self.body = try container.decodeIfPresent(
+                    Swift.String.self,
+                    forKey: .body
+                )
+                self.description = try container.decodeIfPresent(
+                    Swift.String.self,
+                    forKey: .description
+                )
+                self.image = try container.decodeIfPresent(
+                    Swift.String.self,
+                    forKey: .image
+                )
+                self.status = try container.decodeIfPresent(
+                    Components.Schemas.EmailUpdateInput.statusPayload.self,
+                    forKey: .status
+                )
+                self.subject = try container.decodeIfPresent(
+                    Swift.String.self,
+                    forKey: .subject
+                )
+                try decoder.ensureNoAdditionalProperties(knownKeys: [
+                    "body",
+                    "description",
+                    "image",
+                    "status",
+                    "subject"
+                ])
+            }
         }
         /// - Remark: Generated from `#/components/schemas/ErrorMessage`.
         public struct ErrorMessage: Codable, Hashable, Sendable {
@@ -3963,6 +4088,530 @@ public enum Operations {
             /// - Throws: An error if `self` is not `.tooManyRequests`.
             /// - SeeAlso: `.tooManyRequests`.
             public var tooManyRequests: Operations.retrieve_email.Output.TooManyRequests {
+                get throws {
+                    switch self {
+                    case let .tooManyRequests(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "tooManyRequests",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Undocumented response.
+            ///
+            /// A response with a code that is not documented in the OpenAPI document.
+            case undocumented(statusCode: Swift.Int, OpenAPIRuntime.UndocumentedPayload)
+        }
+        @frozen public enum AcceptableContentType: AcceptableProtocol {
+            case json
+            case other(Swift.String)
+            public init?(rawValue: Swift.String) {
+                switch rawValue.lowercased() {
+                case "application/json":
+                    self = .json
+                default:
+                    self = .other(rawValue)
+                }
+            }
+            public var rawValue: Swift.String {
+                switch self {
+                case let .other(string):
+                    return string
+                case .json:
+                    return "application/json"
+                }
+            }
+            public static var allCases: [Self] {
+                [
+                    .json
+                ]
+            }
+        }
+    }
+    /// Update Email
+    ///
+    /// Update an email's properties
+    ///
+    /// - Remark: HTTP `PATCH /emails/{id}`.
+    /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)`.
+    public enum update_email {
+        public static let id: Swift.String = "update_email"
+        public struct Input: Sendable, Hashable {
+            /// - Remark: Generated from `#/paths/emails/{id}/PATCH/path`.
+            public struct Path: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/emails/{id}/PATCH/path/id`.
+                public var id: Swift.String
+                /// Creates a new `Path`.
+                ///
+                /// - Parameters:
+                ///   - id:
+                public init(id: Swift.String) {
+                    self.id = id
+                }
+            }
+            public var path: Operations.update_email.Input.Path
+            /// - Remark: Generated from `#/paths/emails/{id}/PATCH/header`.
+            public struct Headers: Sendable, Hashable {
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.update_email.AcceptableContentType>]
+                /// Creates a new `Headers`.
+                ///
+                /// - Parameters:
+                ///   - accept:
+                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.update_email.AcceptableContentType>] = .defaultValues()) {
+                    self.accept = accept
+                }
+            }
+            public var headers: Operations.update_email.Input.Headers
+            /// - Remark: Generated from `#/paths/emails/{id}/PATCH/requestBody`.
+            @frozen public enum Body: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/emails/{id}/PATCH/requestBody/content/application\/json`.
+                case json(Components.Schemas.EmailUpdateInput)
+            }
+            public var body: Operations.update_email.Input.Body
+            /// Creates a new `Input`.
+            ///
+            /// - Parameters:
+            ///   - path:
+            ///   - headers:
+            ///   - body:
+            public init(
+                path: Operations.update_email.Input.Path,
+                headers: Operations.update_email.Input.Headers = .init(),
+                body: Operations.update_email.Input.Body
+            ) {
+                self.path = path
+                self.headers = headers
+                self.body = body
+            }
+        }
+        @frozen public enum Output: Sendable, Hashable {
+            public struct Ok: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/200/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/200/content/application\/json`.
+                    case json(Components.Schemas.Email)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.Email {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.update_email.Output.Ok.Body
+                /// Creates a new `Ok`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.update_email.Output.Ok.Body) {
+                    self.body = body
+                }
+            }
+            /// OK
+            ///
+            /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)/responses/200`.
+            ///
+            /// HTTP response code: `200 ok`.
+            case ok(Operations.update_email.Output.Ok)
+            /// The associated value of the enum case if `self` is `.ok`.
+            ///
+            /// - Throws: An error if `self` is not `.ok`.
+            /// - SeeAlso: `.ok`.
+            public var ok: Operations.update_email.Output.Ok {
+                get throws {
+                    switch self {
+                    case let .ok(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "ok",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct BadRequest: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/400/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/400/content/application\/json`.
+                    case json(Components.Schemas.ErrorMessage)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.ErrorMessage {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.update_email.Output.BadRequest.Body
+                /// Creates a new `BadRequest`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.update_email.Output.BadRequest.Body) {
+                    self.body = body
+                }
+            }
+            /// Bad Request
+            ///
+            /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)/responses/400`.
+            ///
+            /// HTTP response code: `400 badRequest`.
+            case badRequest(Operations.update_email.Output.BadRequest)
+            /// The associated value of the enum case if `self` is `.badRequest`.
+            ///
+            /// - Throws: An error if `self` is not `.badRequest`.
+            /// - SeeAlso: `.badRequest`.
+            public var badRequest: Operations.update_email.Output.BadRequest {
+                get throws {
+                    switch self {
+                    case let .badRequest(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "badRequest",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct Unauthorized: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/401/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/401/content/application\/json`.
+                    case json(Components.Schemas.ErrorMessage)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.ErrorMessage {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.update_email.Output.Unauthorized.Body
+                /// Creates a new `Unauthorized`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.update_email.Output.Unauthorized.Body) {
+                    self.body = body
+                }
+            }
+            /// Unauthorized
+            ///
+            /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)/responses/401`.
+            ///
+            /// HTTP response code: `401 unauthorized`.
+            case unauthorized(Operations.update_email.Output.Unauthorized)
+            /// The associated value of the enum case if `self` is `.unauthorized`.
+            ///
+            /// - Throws: An error if `self` is not `.unauthorized`.
+            /// - SeeAlso: `.unauthorized`.
+            public var unauthorized: Operations.update_email.Output.Unauthorized {
+                get throws {
+                    switch self {
+                    case let .unauthorized(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "unauthorized",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct Forbidden: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/403/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/403/content/application\/json`.
+                    case json(Components.Schemas.ErrorMessage)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.ErrorMessage {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.update_email.Output.Forbidden.Body
+                /// Creates a new `Forbidden`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.update_email.Output.Forbidden.Body) {
+                    self.body = body
+                }
+            }
+            /// Forbidden
+            ///
+            /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)/responses/403`.
+            ///
+            /// HTTP response code: `403 forbidden`.
+            case forbidden(Operations.update_email.Output.Forbidden)
+            /// The associated value of the enum case if `self` is `.forbidden`.
+            ///
+            /// - Throws: An error if `self` is not `.forbidden`.
+            /// - SeeAlso: `.forbidden`.
+            public var forbidden: Operations.update_email.Output.Forbidden {
+                get throws {
+                    switch self {
+                    case let .forbidden(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "forbidden",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct NotFound: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/404/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/404/content/application\/json`.
+                    case json(Components.Schemas.ErrorMessage)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.ErrorMessage {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.update_email.Output.NotFound.Body
+                /// Creates a new `NotFound`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.update_email.Output.NotFound.Body) {
+                    self.body = body
+                }
+            }
+            /// Not Found
+            ///
+            /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)/responses/404`.
+            ///
+            /// HTTP response code: `404 notFound`.
+            case notFound(Operations.update_email.Output.NotFound)
+            /// The associated value of the enum case if `self` is `.notFound`.
+            ///
+            /// - Throws: An error if `self` is not `.notFound`.
+            /// - SeeAlso: `.notFound`.
+            public var notFound: Operations.update_email.Output.NotFound {
+                get throws {
+                    switch self {
+                    case let .notFound(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "notFound",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct Conflict: Sendable, Hashable {
+                /// Creates a new `Conflict`.
+                public init() {}
+            }
+            /// Conflict
+            ///
+            /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)/responses/409`.
+            ///
+            /// HTTP response code: `409 conflict`.
+            case conflict(Operations.update_email.Output.Conflict)
+            /// Conflict
+            ///
+            /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)/responses/409`.
+            ///
+            /// HTTP response code: `409 conflict`.
+            public static var conflict: Self {
+                .conflict(.init())
+            }
+            /// The associated value of the enum case if `self` is `.conflict`.
+            ///
+            /// - Throws: An error if `self` is not `.conflict`.
+            /// - SeeAlso: `.conflict`.
+            public var conflict: Operations.update_email.Output.Conflict {
+                get throws {
+                    switch self {
+                    case let .conflict(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "conflict",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct UnprocessableContent: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/422/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/422/content/application\/json`.
+                    case json(Components.Schemas.ValidationErrorMessage)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.ValidationErrorMessage {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.update_email.Output.UnprocessableContent.Body
+                /// Creates a new `UnprocessableContent`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.update_email.Output.UnprocessableContent.Body) {
+                    self.body = body
+                }
+            }
+            /// Unprocessable Entity
+            ///
+            /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)/responses/422`.
+            ///
+            /// HTTP response code: `422 unprocessableContent`.
+            case unprocessableContent(Operations.update_email.Output.UnprocessableContent)
+            /// The associated value of the enum case if `self` is `.unprocessableContent`.
+            ///
+            /// - Throws: An error if `self` is not `.unprocessableContent`.
+            /// - SeeAlso: `.unprocessableContent`.
+            public var unprocessableContent: Operations.update_email.Output.UnprocessableContent {
+                get throws {
+                    switch self {
+                    case let .unprocessableContent(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "unprocessableContent",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct TooManyRequests: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/429/headers`.
+                public struct Headers: Sendable, Hashable {
+                    /// Seconds to wait before retrying.
+                    ///
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/429/headers/Retry-After`.
+                    public var Retry_hyphen_After: Swift.Int?
+                    /// Requests permitted per minute.
+                    ///
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/429/headers/X-RateLimit-Limit`.
+                    public var X_hyphen_RateLimit_hyphen_Limit: Swift.Int?
+                    /// Requests remaining in the current window.
+                    ///
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/429/headers/X-RateLimit-Remaining`.
+                    public var X_hyphen_RateLimit_hyphen_Remaining: Swift.Int?
+                    /// Unix timestamp at which the window resets.
+                    ///
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/429/headers/X-RateLimit-Reset`.
+                    public var X_hyphen_RateLimit_hyphen_Reset: Swift.Int?
+                    /// Creates a new `Headers`.
+                    ///
+                    /// - Parameters:
+                    ///   - Retry_hyphen_After: Seconds to wait before retrying.
+                    ///   - X_hyphen_RateLimit_hyphen_Limit: Requests permitted per minute.
+                    ///   - X_hyphen_RateLimit_hyphen_Remaining: Requests remaining in the current window.
+                    ///   - X_hyphen_RateLimit_hyphen_Reset: Unix timestamp at which the window resets.
+                    public init(
+                        Retry_hyphen_After: Swift.Int? = nil,
+                        X_hyphen_RateLimit_hyphen_Limit: Swift.Int? = nil,
+                        X_hyphen_RateLimit_hyphen_Remaining: Swift.Int? = nil,
+                        X_hyphen_RateLimit_hyphen_Reset: Swift.Int? = nil
+                    ) {
+                        self.Retry_hyphen_After = Retry_hyphen_After
+                        self.X_hyphen_RateLimit_hyphen_Limit = X_hyphen_RateLimit_hyphen_Limit
+                        self.X_hyphen_RateLimit_hyphen_Remaining = X_hyphen_RateLimit_hyphen_Remaining
+                        self.X_hyphen_RateLimit_hyphen_Reset = X_hyphen_RateLimit_hyphen_Reset
+                    }
+                }
+                /// Received HTTP response headers
+                public var headers: Operations.update_email.Output.TooManyRequests.Headers
+                /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/429/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/emails/{id}/PATCH/responses/429/content/application\/json`.
+                    case json(Components.Schemas.ErrorMessage)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.ErrorMessage {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.update_email.Output.TooManyRequests.Body
+                /// Creates a new `TooManyRequests`.
+                ///
+                /// - Parameters:
+                ///   - headers: Received HTTP response headers
+                ///   - body: Received HTTP response body
+                public init(
+                    headers: Operations.update_email.Output.TooManyRequests.Headers = .init(),
+                    body: Operations.update_email.Output.TooManyRequests.Body
+                ) {
+                    self.headers = headers
+                    self.body = body
+                }
+            }
+            /// Too Many Requests
+            ///
+            /// - Remark: Generated from `#/paths//emails/{id}/patch(update_email)/responses/429`.
+            ///
+            /// HTTP response code: `429 tooManyRequests`.
+            case tooManyRequests(Operations.update_email.Output.TooManyRequests)
+            /// The associated value of the enum case if `self` is `.tooManyRequests`.
+            ///
+            /// - Throws: An error if `self` is not `.tooManyRequests`.
+            /// - SeeAlso: `.tooManyRequests`.
+            public var tooManyRequests: Operations.update_email.Output.TooManyRequests {
                 get throws {
                     switch self {
                     case let .tooManyRequests(response):

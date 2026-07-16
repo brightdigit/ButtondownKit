@@ -1,0 +1,51 @@
+{
+  "count": 3,
+  "results": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "subject": "Issue One",
+      "body": "First issue body.",
+      "status": "sent",
+      "source": "api",
+      "commenting_mode": "enabled",
+      "archival_mode": "disabled",
+      "absolute_url": "https://buttondown.com/example/archive/issue-one/",
+      "canonical_url": "",
+      "image": "",
+      "description": "",
+      "featured": false,
+      "should_trigger_pay_per_email_billing": false,
+      "related_email_ids": [],
+      "creation_date": "2026-06-17T12:00:00Z",
+      "modification_date": "2026-06-17T12:00:00Z",
+      "filters": {
+        "predicate": "and",
+        "filters": [],
+        "groups": []
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "subject": "Issue Two",
+      "body": "Second issue body.",
+      "status": "sent",
+      "source": "api",
+      "commenting_mode": "enabled",
+      "archival_mode": "disabled",
+      "absolute_url": "https://buttondown.com/example/archive/issue-two/",
+      "canonical_url": "",
+      "image": "",
+      "description": "",
+      "featured": false,
+      "should_trigger_pay_per_email_billing": false,
+      "related_email_ids": [],
+      "creation_date": "2026-06-18T12:00:00Z",
+      "modification_date": "2026-06-18T12:00:00Z",
+      "filters": {
+        "predicate": "and",
+        "filters": [],
+        "groups": []
+      }
+    }
+  ]
+}

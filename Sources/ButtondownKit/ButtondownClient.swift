@@ -41,14 +41,22 @@ import OpenAPIRuntime
 /// newsletter publishing.
 ///
 /// ``ButtondownClient`` wraps the swift-openapi-generator ``Client`` with an
-/// ``AuthenticationMiddleware`` and exposes a small, ergonomic surface: create
-/// a draft email, send a draft, and read emails/subscribers (the reads back
-/// the contract round-trip tests). The underlying transport defaults to
-/// `URLSessionTransport`, which works on both Apple platforms and Linux.
+/// ``AuthenticationMiddleware`` and exposes a small, ergonomic surface via the
+/// capability protocols it conforms to: ``EmailListing`` (list/page emails),
+/// ``EmailDrafting`` (create/send drafts), ``EmailRetrieving`` (read one
+/// email), and ``EmailUpdating`` (patch an email). Those capabilities implement
+/// their methods against ``underlying`` in
+/// extensions constrained on ``UnderlyingClientProtocol``, so this type is only
+/// storage plus initializers. All results are Swift-native domain types
+/// (``Email`` et al.), never the generated `Components.Schemas.*`.
 ///
-/// No subscriber/audience data is stored in the repository; the API key is
-/// supplied via the `BUTTONDOWN_API_KEY` environment variable.
-public struct ButtondownClient: Sendable {
+/// The underlying transport defaults to `URLSessionTransport`, which works on
+/// both Apple platforms and Linux. No subscriber/audience data is stored in the
+/// repository; the API key is supplied via the `BUTTONDOWN_API_KEY` environment
+/// variable.
+public struct ButtondownClient: Sendable, UnderlyingClientProtocol,
+  EmailListing, EmailDrafting, EmailRetrieving, EmailUpdating
+{
   /// Errors surfaced by ``ButtondownClient``.
   public enum ClientError: Error, Equatable {
     /// `BUTTONDOWN_API_KEY` was not set in the environment.
@@ -58,8 +66,28 @@ public struct ButtondownClient: Sendable {
     case unexpectedResponse
   }
 
+  /// The default Buttondown API server URL.
+  ///
+  /// Built from the generated ``Servers/Server1`` constant. If this traps, the
+  /// vendored OpenAPI spec contains an invalid server URL literal.
+  public static let defaultServerURL: URL = {
+    do {
+      return try Servers.Server1.url()
+    } catch {
+      preconditionFailure("Invalid generated Buttondown server URL: \(error)")
+    }
+  }()
+
+  /// The client configuration used by the URLSession-backed initializers.
+  ///
+  /// Installs ``LenientISO8601DateTranscoder`` so the mixed fractional/whole
+  /// second timestamps the Buttondown API returns both decode successfully.
+  public static var defaultConfiguration: Configuration {
+    Configuration(dateTranscoder: LenientISO8601DateTranscoder.default)
+  }
+
   /// The generated, transport-backed API client.
-  private let underlying: Client
+  public let underlying: Client
 
   /// Creates a client from a pre-built generated ``Client``.
   ///
@@ -73,16 +101,47 @@ public struct ButtondownClient: Sendable {
   // URLSession-backed conveniences. Unavailable on WASI (no URLSessionTransport);
   // build a `Client` with a wasm-compatible transport and use `init(underlying:)`.
   #if !os(WASI)
-    /// Creates a client that talks to the live Buttondown API with the given key.
-    /// - Parameter apiKey: The Buttondown API key.
-    /// - Throws: An error if the server URL cannot be constructed.
-    public init(apiKey: String) throws {
-      let client = Client(
-        serverURL: try Servers.Server1.url(),
-        transport: URLSessionTransport(),
-        middlewares: [AuthenticationMiddleware(apiKey: apiKey)]
+    /// Creates a client that talks to the Buttondown API with the given key,
+    /// server URL, and configuration.
+    ///
+    /// This is the designated URLSession-backed initializer; the other
+    /// `apiKey`-based initializers funnel through it.
+    /// - Parameters:
+    ///   - apiKey: The Buttondown API key.
+    ///   - serverURL: The API server URL. Defaults to ``defaultServerURL``.
+    ///   - configuration: The generated-client configuration.
+    public init(
+      apiKey: String,
+      serverURL: URL = ButtondownClient.defaultServerURL,
+      configuration: Configuration
+    ) {
+      self.init(
+        underlying: Client(
+          serverURL: serverURL,
+          configuration: configuration,
+          transport: URLSessionTransport(),
+          middlewares: [AuthenticationMiddleware(apiKey: apiKey)]
+        )
       )
-      self.init(underlying: client)
+    }
+
+    /// Creates a client that talks to the Buttondown API with the given key,
+    /// server URL, and date transcoder.
+    /// - Parameters:
+    ///   - apiKey: The Buttondown API key.
+    ///   - serverURL: The API server URL. Defaults to ``defaultServerURL``.
+    ///   - dateTranscoder: The transcoder used to decode API timestamps.
+    ///     Defaults to ``LenientISO8601DateTranscoder``.
+    public init(
+      apiKey: String,
+      serverURL: URL = ButtondownClient.defaultServerURL,
+      dateTranscoder: any DateTranscoder = LenientISO8601DateTranscoder.default
+    ) {
+      self.init(
+        apiKey: apiKey,
+        serverURL: serverURL,
+        configuration: Configuration(dateTranscoder: dateTranscoder)
+      )
     }
 
     /// Creates a client using the `BUTTONDOWN_API_KEY` environment variable.
@@ -94,69 +153,7 @@ public struct ButtondownClient: Sendable {
       else {
         throw ClientError.missingAPIKey
       }
-      return try ButtondownClient(apiKey: apiKey)
+      return ButtondownClient(apiKey: apiKey)
     }
   #endif
-
-  /// Creates a draft email (newsletter issue) from a Markdown body.
-  ///
-  /// Maps to `POST /emails`. Buttondown is Markdown-native, so `body` is sent
-  /// as-is with no HTML conversion.
-  /// - Parameters:
-  ///   - subject: The email subject line.
-  ///   - body: The Markdown body of the email.
-  /// - Returns: The created ``Components/Schemas/Email``.
-  /// - Throws: ``ClientError/unexpectedResponse`` on a non-201 response, or a
-  ///   transport/decoding error.
-  public func createDraft(
-    subject: String,
-    body: String
-  ) async throws -> Components.Schemas.Email {
-    let input = Components.Schemas.EmailInput(
-      body: body,
-      status: .init(value1: .draft),
-      subject: subject
-    )
-    let output = try await underlying.create_email(body: .json(input))
-    switch output {
-    case .created(let created):
-      return try created.body.json
-    default:
-      throw ClientError.unexpectedResponse
-    }
-  }
-
-  /// Sends a previously-created draft to all subscribers.
-  ///
-  /// Maps to `POST /emails/{id}/send-draft`.
-  /// - Parameter id: The id of the draft email to send.
-  /// - Throws: ``ClientError/unexpectedResponse`` on a non-200 response, or a
-  ///   transport error.
-  public func sendDraft(id: String) async throws {
-    let output = try await underlying.send_draft(
-      path: .init(id: id),
-      body: .json(.init())
-    )
-    switch output {
-    case .ok:
-      return
-    default:
-      throw ClientError.unexpectedResponse
-    }
-  }
-
-  /// Retrieves a single email by id. Maps to `GET /emails/{id}`.
-  /// - Parameter id: The email id.
-  /// - Returns: The ``Components/Schemas/Email``.
-  /// - Throws: ``ClientError/unexpectedResponse`` on a non-200 response, or a
-  ///   transport/decoding error.
-  public func email(id: String) async throws -> Components.Schemas.Email {
-    let output = try await underlying.retrieve_email(path: .init(id: id))
-    switch output {
-    case .ok(let response):
-      return try response.body.json
-    default:
-      throw ClientError.unexpectedResponse
-    }
-  }
 }
