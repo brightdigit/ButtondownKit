@@ -1314,6 +1314,10 @@ public enum Components {
             ///
             /// - Remark: Generated from `#/components/schemas/EmailUpdateInput/image`.
             public var image: Swift.String?
+            /// The date and time at which the email should be published in the future (for scheduled emails), or the date and time at which the email was published (for sent emails).
+            ///
+            /// - Remark: Generated from `#/components/schemas/EmailUpdateInput/publish_date`.
+            public var publish_date: Foundation.Date?
             /// The status of the email (e.g. `draft`, `about_to_send`, `sent`, `scheduled`).
             ///
             /// - Remark: Generated from `#/components/schemas/EmailUpdateInput/status`.
@@ -1348,18 +1352,21 @@ public enum Components {
             ///   - body: The body of the email, in either HTML or markdown format. Buttondown attempts to intelligently detect the format of the body automatically, but you can also specify the format explicitly by prepending the text with the `buttondown-editor-mode` comment: `<!-- buttondown-editor-mode: fancy -->` or `<!-- buttondown-editor-mode: plaintext -->`.
             ///   - description: A human-readable description of the email, used for archives and SEO.
             ///   - image: A primary image URL used when previewing the email on the web or in other contexts.
+            ///   - publish_date: The date and time at which the email should be published in the future (for scheduled emails), or the date and time at which the email was published (for sent emails).
             ///   - status: The status of the email (e.g. `draft`, `about_to_send`, `sent`, `scheduled`).
             ///   - subject: The subject line for the email.
             public init(
                 body: Swift.String? = nil,
                 description: Swift.String? = nil,
                 image: Swift.String? = nil,
+                publish_date: Foundation.Date? = nil,
                 status: Components.Schemas.EmailUpdateInput.statusPayload? = nil,
                 subject: Swift.String? = nil
             ) {
                 self.body = body
                 self.description = description
                 self.image = image
+                self.publish_date = publish_date
                 self.status = status
                 self.subject = subject
             }
@@ -1367,6 +1374,7 @@ public enum Components {
                 case body
                 case description
                 case image
+                case publish_date
                 case status
                 case subject
             }
@@ -1384,6 +1392,10 @@ public enum Components {
                     Swift.String.self,
                     forKey: .image
                 )
+                self.publish_date = try container.decodeIfPresent(
+                    Foundation.Date.self,
+                    forKey: .publish_date
+                )
                 self.status = try container.decodeIfPresent(
                     Components.Schemas.EmailUpdateInput.statusPayload.self,
                     forKey: .status
@@ -1396,6 +1408,7 @@ public enum Components {
                     "body",
                     "description",
                     "image",
+                    "publish_date",
                     "status",
                     "subject"
                 ])

@@ -27,6 +27,8 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import Foundation
+
 /// The capability to update (patch) an existing email.
 public protocol EmailUpdating {
   /// Updates fields on an existing email, leaving unspecified fields unchanged.
@@ -35,6 +37,8 @@ public protocol EmailUpdating {
   ///   - subject: A new subject line, or `nil` to leave it unchanged.
   ///   - body: A new body (HTML or Markdown), or `nil` to leave it unchanged.
   ///   - description: A new description, or `nil` to leave it unchanged.
+  ///   - image: A new preview image URL, or `nil` to leave it unchanged.
+  ///   - publishDate: A new archive publication date, or `nil` to leave it unchanged.
   ///   - status: A new status, or `nil` to leave it unchanged.
   /// - Returns: The updated ``Email``.
   /// - Throws: An error if the request fails or the response is unexpected.
@@ -43,6 +47,8 @@ public protocol EmailUpdating {
     subject: String?,
     body: String?,
     description: String?,
+    image: String?,
+    publishDate: Date?,
     status: EmailStatus?
   ) async throws -> Email
 }
@@ -58,6 +64,8 @@ extension EmailUpdating where Self: UnderlyingClientProtocol {
   ///   - subject: A new subject line, or `nil` to leave it unchanged.
   ///   - body: A new body (HTML or Markdown), or `nil` to leave it unchanged.
   ///   - description: A new description, or `nil` to leave it unchanged.
+  ///   - image: A new preview image URL, or `nil` to leave it unchanged.
+  ///   - publishDate: A new archive publication date, or `nil` to leave it unchanged.
   ///   - status: A new status, or `nil` to leave it unchanged.
   /// - Returns: The updated ``Email``.
   /// - Throws: ``ButtondownClient/ClientError/unexpectedResponse`` on a non-200
@@ -67,11 +75,15 @@ extension EmailUpdating where Self: UnderlyingClientProtocol {
     subject: String? = nil,
     body: String? = nil,
     description: String? = nil,
+    image: String? = nil,
+    publishDate: Date? = nil,
     status: EmailStatus? = nil
   ) async throws -> Email {
     let input = Components.Schemas.EmailUpdateInput(
       body: body,
       description: description,
+      image: image,
+      publish_date: publishDate,
       status: status.map { .init(value1: $0.schema) },
       subject: subject
     )

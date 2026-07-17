@@ -73,6 +73,9 @@ import Testing
     let email = try await client.updateEmail(
       id: Self.emailID,
       body: "# Heading\n\nThis is the cleaned newsletter body.",
+      description: "Archive description",
+      image: "https://example.com/social.jpg",
+      publishDate: Date(timeIntervalSince1970: 1_704_067_200),
       status: .imported
     )
 
@@ -86,6 +89,9 @@ import Testing
     #expect(request.path == "/emails/\(Self.emailID)")
     let body = try #require(request.body)
     #expect(body.contains("cleaned newsletter body"), "the new body should be sent")
+    #expect(body.contains("Archive description"), "description should serialize")
+    #expect(body.contains("social.jpg"), "image should serialize")
+    #expect(body.contains("2024-01-01T00:00:00Z"), "publish date should serialize as ISO-8601")
     #expect(body.contains("imported"), "status should serialize as imported")
     // Unspecified fields are omitted from the PATCH payload.
     #expect(!body.contains("\"subject\""), "subject was not supplied, so it should be omitted")

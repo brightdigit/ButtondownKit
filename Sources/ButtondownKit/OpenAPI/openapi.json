@@ -3653,20 +3653,9 @@
             "title": "Metadata"
           },
           "publish_date": {
-            "anyOf": [
-              {
-                "format": "date-time",
-                "type": "string"
-              },
-              {
-                "const": "none",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "The date and time at which the email should be published in the future (for scheduled emails), or the date and time at which the email was published (for sent emails). Pass `\"none\"` to clear a scheduled date.",
+            "format": "date-time",
+            "type": "string",
+            "description": "The date and time at which the email should be published in the future (for scheduled emails), or the date and time at which the email was published (for sent emails).",
             "title": "Publish Date"
           },
           "related_email_ids": {
