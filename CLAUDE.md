@@ -71,3 +71,15 @@ transport **with the real `AuthenticationMiddleware`** so auth behavior is exerc
   `lint.sh` locally). Don't hand-maintain headers; files under `Generated/` are skipped.
 - No subscriber/audience data or API keys live in the repo; the key only ever comes from
   `BUTTONDOWN_API_KEY`.
+
+## Memory & Corrections Convention
+
+`.claude/agent-notes.md` is the canonical, versioned corrections log for this repository — an
+append-only record of the maintainer's corrections and standing **always/never** directives.
+
+- **Read `.claude/agent-notes.md` at the start of every work session, before doing any work.** It
+  is the source of truth for *how* to work in this repo.
+- **Whenever the maintainer makes a correction or gives an always/never instruction, append one
+  line to `.claude/agent-notes.md` proactively (without being asked).** One line per directive,
+  newest at the bottom. If a directive supersedes an earlier one, update or remove the stale line
+  rather than leaving both.
