@@ -1,6 +1,6 @@
 # ButtondownKit
 
-<p align="center">A small async Swift client for the Buttondown API.</p>
+A small async Swift client for the Buttondown API.
 
 <!-- Platform Compatibility -->
 [![Swift Versions](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbrightdigit%2FButtondownKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/brightdigit/ButtondownKit)
@@ -44,14 +44,19 @@ CLI, BufferKit — lives in #33 / Phase 6 and is **not** part of this package.
 
 ### Filtered operations
 
+These are the operations generated into the committed client. Only the email
+operations are surfaced as `ButtondownClient` methods today; the subscriber
+operations are generated but not yet exposed on the public client.
+
 | Operation | Endpoint | Purpose |
 | --- | --- | --- |
 | `create_email` | `POST /emails` | Create a draft (Markdown body) |
+| `update_email` | `PATCH /emails/{id}` | Update an existing email |
 | `send_draft` | `POST /emails/{id}/send-draft` | Send the draft to subscribers |
-| `list_emails` | `GET /emails` | Read (round-trip tests) |
+| `list_emails` | `GET /emails` | Read (list/round-trip tests) |
 | `retrieve_email` | `GET /emails/{id}` | Read (round-trip tests) |
-| `list_subscribers` | `GET /subscribers` | Subscriber read |
-| `retrieve_subscriber` | `GET /subscribers/{id_or_email}` | Subscriber read |
+| `list_subscribers` | `GET /subscribers` | Subscriber read (generated, not yet surfaced) |
+| `retrieve_subscriber` | `GET /subscribers/{id_or_email}` | Subscriber read (generated, not yet surfaced) |
 
 ## Authentication
 
