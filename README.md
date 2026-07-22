@@ -1,20 +1,16 @@
 # ButtondownKit
 
-A small async Swift client for the Buttondown API.
 
-<!-- Platform Compatibility -->
 [![Swift Versions](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbrightdigit%2FButtondownKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/brightdigit/ButtondownKit)
 [![Platforms](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbrightdigit%2FButtondownKit%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/brightdigit/ButtondownKit)
-
-<!-- Documentation & License -->
 [![Documentation](https://img.shields.io/badge/docc-read_documentation-blue)](https://swiftpackageindex.com/brightdigit/ButtondownKit/documentation)
 [![License](https://img.shields.io/github/license/brightdigit/ButtondownKit)](LICENSE)
-
-<!-- CI/CD & Code Quality -->
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/brightdigit/ButtondownKit/ButtondownKit.yml?label=actions&logo=github&branch=main)](https://github.com/brightdigit/ButtondownKit/actions)
 [![Maintainability](https://qlty.sh/gh/brightdigit/projects/ButtondownKit/maintainability.svg)](https://qlty.sh/gh/brightdigit/projects/ButtondownKit)
 [![Codecov](https://img.shields.io/codecov/c/github/brightdigit/ButtondownKit)](https://codecov.io/gh/brightdigit/ButtondownKit)
 [![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/brightdigit/ButtondownKit)](https://www.codefactor.io/repository/github/brightdigit/ButtondownKit)
+
+A small async Swift client for the Buttondown API.
 
 ---
 
@@ -27,6 +23,22 @@ wrapped in an ergonomic `ButtondownClient`.
 This is a greenfield client (issue #83), part of the Phase 4 OpenAPI client
 migration (#82). The actual publishing pipeline — PublishKit, the `publish`
 CLI, BufferKit — lives in #33 / Phase 6 and is **not** part of this package.
+
+## Installation
+
+Add ButtondownKit as a Swift Package Manager dependency in your `Package.swift`:
+
+```swift
+dependencies: [
+  .package(url: "https://github.com/brightdigit/ButtondownKit.git", from: "1.0.0-alpha.1")
+],
+targets: [
+  .target(
+    name: "YourTarget",
+    dependencies: ["ButtondownKit"]
+  )
+]
+```
 
 ## Architecture
 
