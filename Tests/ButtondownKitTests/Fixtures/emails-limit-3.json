@@ -1,0 +1,51 @@
+{
+  "count": 6,
+  "results": [
+    {
+      "id": "00000000-0000-0000-0000-000000000014",
+      "subject": "Limit Five",
+      "body": "Limit Five body.",
+      "status": "sent",
+      "source": "api",
+      "commenting_mode": "enabled",
+      "archival_mode": "disabled",
+      "absolute_url": "https://buttondown.com/example/archive/limit-five/",
+      "canonical_url": "",
+      "image": "",
+      "description": "",
+      "featured": false,
+      "should_trigger_pay_per_email_billing": false,
+      "related_email_ids": [],
+      "creation_date": "2026-06-17T12:00:00Z",
+      "modification_date": "2026-06-17T12:00:00Z",
+      "filters": {
+        "predicate": "and",
+        "filters": [],
+        "groups": []
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000015",
+      "subject": "Limit Six",
+      "body": "Limit Six body.",
+      "status": "sent",
+      "source": "api",
+      "commenting_mode": "enabled",
+      "archival_mode": "disabled",
+      "absolute_url": "https://buttondown.com/example/archive/limit-six/",
+      "canonical_url": "",
+      "image": "",
+      "description": "",
+      "featured": false,
+      "should_trigger_pay_per_email_billing": false,
+      "related_email_ids": [],
+      "creation_date": "2026-06-17T12:00:00Z",
+      "modification_date": "2026-06-17T12:00:00Z",
+      "filters": {
+        "predicate": "and",
+        "filters": [],
+        "groups": []
+      }
+    }
+  ]
+}

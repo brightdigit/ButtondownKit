@@ -22,6 +22,7 @@ additionalFileComments:
 filter:
   operations:
     - create_email      # POST /emails               — create a draft
+    - update_email      # PATCH /emails/{id}         — update an existing email
     - send_draft        # POST /emails/{id}/send-draft — send the draft
     - list_emails       # GET  /emails               — read (round-trip tests)
     - retrieve_email    # GET  /emails/{id}          — read (round-trip tests)

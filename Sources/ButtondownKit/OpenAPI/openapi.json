@@ -3562,17 +3562,10 @@
             "title": "Attachments"
           },
           "body": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
             "description": "The body of the email, in either HTML or markdown format. Buttondown attempts to intelligently detect the format of the body automatically, but you can also specify the format explicitly by prepending the text with the `buttondown-editor-mode` comment: `<!-- buttondown-editor-mode: fancy -->` or `<!-- buttondown-editor-mode: plaintext -->`.",
             "example": "This is an example of the body of an email.",
-            "title": "Body"
+            "title": "Body",
+            "type": "string"
           },
           "canonical_url": {
             "anyOf": [
@@ -3600,16 +3593,9 @@
             "description": "Controls whether subscribers can comment on this email."
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
             "description": "A human-readable description of the email, used for archives and SEO.",
-            "title": "Description"
+            "title": "Description",
+            "type": "string"
           },
           "email_type": {
             "anyOf": [
@@ -3667,20 +3653,9 @@
             "title": "Metadata"
           },
           "publish_date": {
-            "anyOf": [
-              {
-                "format": "date-time",
-                "type": "string"
-              },
-              {
-                "const": "none",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "The date and time at which the email should be published in the future (for scheduled emails), or the date and time at which the email was published (for sent emails). Pass `\"none\"` to clear a scheduled date.",
+            "format": "date-time",
+            "type": "string",
+            "description": "The date and time at which the email should be published in the future (for scheduled emails), or the date and time at which the email was published (for sent emails).",
             "title": "Publish Date"
           },
           "related_email_ids": {
@@ -3744,29 +3719,19 @@
             "title": "Slug"
           },
           "status": {
-            "anyOf": [
+            "allOf": [
               {
                 "$ref": "#/components/schemas/EmailStatus"
-              },
-              {
-                "type": "null"
               }
             ],
             "description": "The status of the email (e.g. `draft`, `about_to_send`, `sent`, `scheduled`)."
           },
           "subject": {
-            "anyOf": [
-              {
-                "maxLength": 2000,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
             "description": "The subject line for the email.",
             "example": "The subject line for the email",
-            "title": "Subject"
+            "maxLength": 2000,
+            "title": "Subject",
+            "type": "string"
           },
           "suppression_reason": {
             "anyOf": [

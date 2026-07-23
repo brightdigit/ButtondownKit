@@ -1,0 +1,51 @@
+{
+  "count": 2,
+  "results": [
+    {
+      "id": "00000000-0000-0000-0000-0000000000f1",
+      "subject": "Fractional One",
+      "body": "Body with fractional creation date.",
+      "status": "sent",
+      "source": "api",
+      "commenting_mode": "enabled",
+      "archival_mode": "disabled",
+      "absolute_url": "https://buttondown.com/example/archive/fractional-one/",
+      "canonical_url": "",
+      "image": "",
+      "description": "",
+      "featured": false,
+      "should_trigger_pay_per_email_billing": false,
+      "related_email_ids": [],
+      "creation_date": "2026-06-29T18:36:10.808726Z",
+      "modification_date": "2026-06-30T12:05:51.860935Z",
+      "filters": {
+        "predicate": "and",
+        "filters": [],
+        "groups": []
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-0000000000f2",
+      "subject": "Whole Second Two",
+      "body": "Body with whole-second creation date.",
+      "status": "sent",
+      "source": "api",
+      "commenting_mode": "enabled",
+      "archival_mode": "disabled",
+      "absolute_url": "https://buttondown.com/example/archive/whole-second-two/",
+      "canonical_url": "",
+      "image": "",
+      "description": "",
+      "featured": false,
+      "should_trigger_pay_per_email_billing": false,
+      "related_email_ids": [],
+      "creation_date": "2026-06-30T12:03:00Z",
+      "modification_date": "2026-06-30T12:03:00Z",
+      "filters": {
+        "predicate": "and",
+        "filters": [],
+        "groups": []
+      }
+    }
+  ]
+}
