@@ -1,0 +1,23 @@
+{
+  "id": "00000000-0000-0000-0000-000000000001",
+  "subject": "Hello from ButtondownKit",
+  "body": "# Heading\n\nThis is a **Markdown** newsletter body.",
+  "status": "draft",
+  "source": "api",
+  "commenting_mode": "enabled",
+  "archival_mode": "disabled",
+  "absolute_url": "https://buttondown.com/example/archive/hello-from-buttondownkit/",
+  "canonical_url": "",
+  "image": "",
+  "description": "",
+  "featured": false,
+  "should_trigger_pay_per_email_billing": false,
+  "related_email_ids": [],
+  "creation_date": "2026-06-17T12:00:00Z",
+  "modification_date": "2026-06-17T12:00:00Z",
+  "filters": {
+    "predicate": "and",
+    "filters": [],
+    "groups": []
+  }
+}
